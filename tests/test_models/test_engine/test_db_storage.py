@@ -1,4 +1,5 @@
-#!/usr/bin/python3
+
+# !/usr/bin/python3
 """
 Contains the TestDBStorageDocs and TestDBStorage classes
 """
@@ -6,7 +7,7 @@ Contains the TestDBStorageDocs and TestDBStorage classes
 from datetime import datetime
 import inspect
 import models
-from models.engine import db_storage
+from models.engine import db_storage, file_storage
 from models.amenity import Amenity
 from models.base_model import BaseModel
 from models.city import City
@@ -86,3 +87,26 @@ class TestFileStorage(unittest.TestCase):
     @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
     def test_save(self):
         """Test that save properly saves objects to file.json"""
+
+    def test_get_db(self):
+        """ Tests for obtaining an instance db storage"""
+        dic = {"name": "Cundinamarca"}
+        instance = State(**dic)
+        storage = file_storage.FileStorage()
+        storage.new(instance)
+        storage.save()
+        get_instance = storage.get(State, instance.id)
+        self.assertEqual(get_instance, instance)
+
+    def test_count(self):
+        """ Tests for checking the count method db storage """
+        dic = {"name": "Vecindad"}
+        state = State(**dic)
+        storage = file_storage.FileStorage()
+        storage.new(state)
+        dic = {"name": "Mexico", "state_id": state.id}
+        city = City(**dic)
+        storage.new(city)
+        storage.save()
+        c = storage.count()
+        self.assertEqual(len(storage.all()), c)
